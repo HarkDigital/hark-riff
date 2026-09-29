@@ -1,0 +1,580 @@
+/* ------------------------------------------------------------------
+   CONTACT · Encore — the last panel and the sign-off.
+   side (landscape): the panel on the left, centred in the band
+   stack (portrait): the panel along the bottom of the band
+   contact-fit-1..3: measured step-downs; is-split: two beats (A, then B)
+   The layout is measured in hud.ts: keep the two in sync.
+   ------------------------------------------------------------------ */
+
+.contact-root {
+  position: absolute;
+  inset: 0;
+}
+
+/* the band between the chrome's safe areas (measured, never visible) */
+.contact-probe,
+.contact-dock {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  top: var(--safe-top);
+  bottom: var(--safe-bottom);
+}
+.contact-probe {
+  visibility: hidden;
+  pointer-events: none;
+}
+.contact-dock {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  pointer-events: none;
+}
+
+/* the panel: black tolex with a cream piping frame, like the border round a
+   grille cloth (opaque: no backdrop blur over the canvas) */
+.contact-panel {
+  --gap: 16px;
+  width: min(520px, 42vw);
+  display: grid;
+  gap: calc(var(--gap) + 6px);
+  padding: 30px 32px 22px;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(243, 230, 204, 0.045), rgba(243, 230, 204, 0) 60%),
+    rgba(11, 8, 6, 0.95);
+  border: 1px solid rgba(243, 230, 204, 0.08);
+  border-radius: 12px;
+  box-shadow:
+    0 36px 90px rgba(0, 0, 0, 0.62),
+    0 0 0 1px rgba(0, 0, 0, 0.7);
+}
+.contact-panel::before {
+  left: 7px;
+  right: 7px;
+  top: 7px;
+  bottom: 7px;
+  height: auto;
+  background: none;
+  border: 1.5px solid rgba(233, 220, 192, 0.26);
+  border-radius: 7px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+.contact-part {
+  position: relative;
+  display: grid;
+  gap: var(--gap);
+  align-content: start;
+  min-width: 0;
+}
+/* a second run of piping between the two parts */
+.contact-b {
+  padding-top: calc(var(--gap) + 4px);
+  gap: calc(var(--gap) - 4px);
+}
+.contact-b::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: 0;
+  height: 1.5px;
+  background: rgba(233, 220, 192, 0.26);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+.contact-title {
+  font-size: clamp(2.6rem, 5vw, 5.1rem);
+  line-height: 0.92;
+  margin-top: 2px;
+}
+.contact-body {
+  max-width: 46ch;
+}
+
+/* ---------------- the call to action ---------------- */
+
+.contact-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+  margin-top: 2px;
+}
+
+/* the address on a brushed-gold amp plate with an INPUT jack */
+.contact-plate {
+  position: relative;
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 62px;
+  padding: 10px 20px 10px 12px;
+  color: var(--ink);
+  text-decoration: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 250, 235, 0.08) 0 1px, rgba(90, 60, 20, 0.05) 1px 2px, rgba(0, 0, 0, 0) 2px 4px),
+    linear-gradient(180deg, #f8e8c2 0%, #e8c98c 52%, #d2a862 100%);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -2px 0 rgba(110, 70, 20, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 12px 34px rgba(242, 163, 58, 0.16);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+.contact-plate:hover,
+.contact-plate:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -2px 0 rgba(110, 70, 20, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 14px 40px rgba(242, 163, 58, 0.32);
+}
+/* the jack: a nickel nut, a black socket */
+.contact-jack {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    #070605 0 26%,
+    #3b3630 28% 33%,
+    #f3eee4 36%,
+    #a39c90 47%,
+    #ebe5d9 56%,
+    #6b655b 63%,
+    rgba(80, 52, 18, 0.55) 66%,
+    rgba(80, 52, 18, 0) 71%
+  );
+  transition: box-shadow 0.25s ease;
+}
+.contact-plate:hover .contact-jack,
+.contact-plate:focus-visible .contact-jack {
+  box-shadow: 0 0 0 3px rgba(161, 74, 20, 0.28);
+}
+.contact-addr {
+  font-family: var(--font-display);
+  font-weight: 780;
+  font-stretch: 108%;
+  font-size: clamp(20px, 1.85vw, 27px);
+  letter-spacing: -0.012em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.contact-go {
+  margin-left: auto;
+  padding-left: 6px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 20px;
+  transition: transform 0.25s ease;
+}
+.contact-plate:hover .contact-go,
+.contact-plate:focus-visible .contact-go {
+  transform: translateX(4px);
+}
+
+/* Copy email: a ghost switch with its own jewel lamp */
+.contact-copy {
+  min-height: 42px;
+  /* the label swaps to "Copied": hold the width */
+  min-width: 142px;
+  padding: 10px 18px 10px 14px;
+}
+.contact-lamp {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #6b3a1d 0%, #3a1c0c 60%, #1c0d06 100%);
+  box-shadow: 0 0 0 2px rgba(243, 230, 204, 0.16);
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.contact-copy.is-copied .contact-lamp {
+  background: radial-gradient(circle at 35% 35%, #fff0c8 0%, #ffc46a 40%, #d0602a 100%);
+  box-shadow:
+    0 0 0 2px rgba(243, 230, 204, 0.24),
+    0 0 14px rgba(255, 170, 70, 0.9);
+}
+.contact-copy.is-copied {
+  box-shadow: inset 0 0 0 1px rgba(255, 196, 106, 0.85);
+}
+.contact-copy.is-failed .contact-lamp {
+  background: #3a1c0c;
+}
+
+/* ---------------- THE TOUR (the back of the tour T-shirt) ---------------- */
+
+.contact-tour {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 4px;
+}
+.contact-arc {
+  display: block;
+  width: min(300px, 86%);
+  height: auto;
+  margin: 0 auto -6px;
+  overflow: visible;
+}
+.contact-arc-t {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 125%;
+  font-size: 33px;
+  letter-spacing: 4px;
+  fill: var(--signal);
+}
+.contact-arc-star {
+  fill: var(--signal);
+}
+.contact-tour-sub {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+.contact-tour-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 440px;
+}
+.contact-tour-list li {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* equal air both sides, so every printed line centres exactly */
+  padding: 0 var(--tour-gap, 13px);
+}
+/* a printed star between the names (outside the flow: hiding the one at the
+   end of a line never re-wraps the list) */
+.contact-tour-list li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -4.5px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin-top: -5.5px;
+  background: var(--signal);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  opacity: 0.9;
+}
+.contact-tour-list li.is-eol::after {
+  visibility: hidden;
+}
+.contact-tour-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 29px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 72%;
+  font-size: 17px;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+.contact-tour-link:hover,
+.contact-tour-link:focus-visible {
+  color: var(--amber-hot);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.contact-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 18px;
+  margin-top: 6px;
+}
+.contact-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.contact-top:hover,
+.contact-top:focus-visible {
+  color: var(--amber-hot);
+}
+.contact-arr {
+  font-size: 1.05em;
+}
+.contact-legal {
+  margin: 0;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+}
+.contact-nw {
+  white-space: nowrap;
+}
+
+/* ---------------- the sign-off (the site's last frames) ---------------- */
+
+.contact-end {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: var(--safe-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+}
+/* a soft pool of shade so the sign-off reads over the lit boards */
+.contact-end::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(760px, 120%);
+  height: 150%;
+  transform: translate(-50%, -48%);
+  background: radial-gradient(closest-side, rgba(8, 5, 4, 0.72), rgba(8, 5, 4, 0.45) 55%, rgba(8, 5, 4, 0) 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+.contact-thanks {
+  margin: 0 0 2px;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(38px, 4.4vw, 64px);
+  line-height: 1.05;
+  color: var(--amber-hot);
+  text-shadow:
+    0 2px 18px rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(255, 140, 40, 0.28);
+}
+.contact-plate--end {
+  flex: none;
+  min-height: 54px;
+  padding: 8px 18px 8px 10px;
+}
+.contact-plate--end .contact-jack {
+  width: 32px;
+  height: 32px;
+}
+.contact-plate--end .contact-addr {
+  font-size: clamp(19px, 1.6vw, 24px);
+}
+.contact-end-row {
+  display: flex;
+  gap: 12px;
+}
+.contact-top--end {
+  min-height: 40px;
+  padding: 10px 18px;
+  font-size: 12px;
+}
+.contact-top--end:hover,
+.contact-top--end:focus-visible {
+  color: var(--fg);
+}
+.contact-legal--end {
+  color: var(--fg-muted);
+}
+
+/* ---------------- measured step-downs ---------------- */
+.contact-fit-1 .contact-panel {
+  --gap: 12px;
+  padding: 24px 28px 18px;
+}
+.contact-fit-1 .contact-title {
+  font-size: clamp(2.4rem, 4.3vw, 4.2rem);
+}
+.contact-fit-1 .contact-arc {
+  width: min(250px, 80%);
+}
+.contact-fit-2 .contact-body {
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.contact-fit-2 .contact-plate {
+  min-height: 54px;
+  padding: 8px 18px 8px 10px;
+}
+.contact-fit-2 .contact-jack {
+  width: 32px;
+  height: 32px;
+}
+.contact-fit-2 .contact-tour-link {
+  min-height: 26px;
+  font-size: 16px;
+}
+.contact-fit-3 .contact-panel {
+  --gap: 9px;
+  padding: 20px 24px 14px;
+}
+.contact-fit-3 .contact-title {
+  font-size: clamp(2.1rem, 3.6vw, 3.3rem);
+}
+.contact-fit-3 .contact-body {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.contact-fit-3 .contact-copy {
+  min-height: 36px;
+  padding: 8px 16px 8px 12px;
+}
+.contact-fit-3 .contact-arc {
+  width: min(210px, 72%);
+}
+
+/* ---------------- two beats (short screens) ---------------- */
+.contact-root.is-split .contact-b {
+  display: none;
+}
+.contact-root.is-split.show-b .contact-a {
+  display: none;
+}
+.contact-root.is-split.show-b .contact-b {
+  display: grid;
+  padding-top: 0;
+}
+.contact-root.is-split.show-b .contact-b::before {
+  display: none;
+}
+
+/* ---------------- portrait: the panel along the bottom ---------------- */
+.contact-root.is-stack .contact-dock {
+  align-items: flex-end;
+  justify-content: center;
+}
+.contact-root.is-stack .contact-panel {
+  width: 100%;
+  max-width: 640px;
+}
+.contact-root.is-stack .contact-title {
+  font-size: clamp(2.4rem, 9.4vw, 4.6rem);
+}
+.contact-root.is-stack .contact-addr {
+  font-size: clamp(19px, 5.2vw, 27px);
+}
+@media (max-width: 480px) {
+  .contact-root.is-stack .contact-panel {
+    --gap: 12px;
+    padding: 20px 20px 14px;
+  }
+  .contact-root.is-stack .contact-body {
+    font-size: 14.5px;
+    line-height: 1.52;
+  }
+  .contact-root.is-stack .contact-plate {
+    gap: 10px;
+    padding-right: 14px;
+  }
+  .contact-root.is-stack .contact-tour-link {
+    font-size: 15.5px;
+  }
+  .contact-root.is-stack .contact-tour-list {
+    --tour-gap: 10px;
+  }
+  .contact-root.is-stack .contact-foot {
+    justify-content: center;
+    text-align: center;
+  }
+  .contact-thanks {
+    font-size: 40px;
+  }
+}
+
+/* ---------------- short landscape (phones sideways, 200% zoom) ---------------- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .contact-panel {
+    width: min(480px, 54vw);
+    --gap: 8px;
+    padding: 16px 20px 12px;
+  }
+  .contact-panel::before {
+    left: 5px;
+    right: 5px;
+    top: 5px;
+    bottom: 5px;
+  }
+  .contact-title {
+    font-size: clamp(1.9rem, 6.4vh, 2.6rem);
+  }
+  .contact-body {
+    font-size: 13px;
+    line-height: 1.42;
+  }
+  .contact-cta {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .contact-plate {
+    flex: 1 1 auto;
+    min-height: 44px;
+    padding: 6px 12px 6px 8px;
+    gap: 8px;
+  }
+  .contact-jack {
+    width: 26px;
+    height: 26px;
+  }
+  .contact-addr {
+    font-size: 17px;
+  }
+  .contact-go {
+    font-size: 16px;
+  }
+  .contact-copy {
+    flex: none;
+    min-height: 44px;
+    padding: 8px 12px 8px 10px;
+  }
+  .contact-arc {
+    width: min(200px, 60%);
+  }
+  .contact-tour-link {
+    min-height: 26px;
+    font-size: 15px;
+  }
+  .contact-end {
+    gap: 6px;
+  }
+  .contact-thanks {
+    font-size: 32px;
+  }
+  .contact-plate--end {
+    min-height: 44px;
+  }
+  .contact-top--end {
+    min-height: 36px;
+    padding: 8px 14px;
+  }
+}

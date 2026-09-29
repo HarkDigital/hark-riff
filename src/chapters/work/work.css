@@ -1,0 +1,346 @@
+/* WORK · The Pedalboard — chapter-scoped layout (prefix .pb-) */
+
+/* intro: eyebrow + headline on the left, the board lit to the right */
+.pb-intro {
+  position: absolute;
+  left: var(--gutter);
+  top: calc(var(--safe-top) + (100% - var(--safe-top) - var(--safe-bottom)) / 2);
+  transform: translateY(-58%);
+  max-width: min(560px, 40vw);
+  display: grid;
+  gap: 18px;
+  pointer-events: none;
+}
+.pb-title {
+  font-size: clamp(2.7rem, 5.5vw, 5.6rem);
+}
+
+/* the card: which pedal is on, and whose site is on the wall */
+.pb-card {
+  --pb-enamel: #d29d1c;
+  --pb-ink: #17110a;
+  position: absolute;
+  left: var(--gutter);
+  top: calc(var(--safe-top) + (100% - var(--safe-top) - var(--safe-bottom)) / 2);
+  transform: translateY(-50%);
+  width: min(400px, 33vw);
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+/* tolex-black and opaque: a bright wall never reads through the copy */
+.pb-card.hud-panel {
+  background: rgba(12, 8, 6, 0.95);
+}
+
+/* the stompbox it came from: a little enamel plate with its LED */
+.pb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 2px;
+  padding: 5px 11px 5px 8px;
+  border-radius: 4px;
+  background: var(--pb-enamel);
+  color: var(--pb-ink);
+  font-family: var(--font-display);
+  font-weight: 860;
+  font-stretch: 112%;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+.pb-chip-led {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4a2a10;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.pb-card.is-on .pb-chip-led {
+  background: radial-gradient(circle at 35% 35%, #fff0c8 0%, #ffae42 50%, #c0600e 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 0 10px 2px rgba(255, 174, 66, 0.85);
+}
+
+.pb-meta {
+  margin: 0;
+}
+
+/* the client's name on a strip of white gaffer tape, marker caps */
+.pb-name {
+  position: relative;
+  margin: 2px 0 4px -4px;
+  padding: 7px 18px 6px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 78%;
+  font-size: clamp(1.45rem, 2.1vw, 2.05rem);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #16110d;
+  background:
+    repeating-linear-gradient(0deg, rgba(120, 100, 70, 0.06) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #f4efe3 0%, #e3dac8 100%);
+  transform: rotate(-1.1deg);
+  /* torn ends */
+  clip-path: polygon(
+    1.2% 0,
+    98.6% 0,
+    100% 12%,
+    98.4% 26%,
+    99.6% 41%,
+    98.2% 57%,
+    99.8% 72%,
+    98.5% 88%,
+    99.4% 100%,
+    1.4% 100%,
+    0 86%,
+    1.5% 71%,
+    0.2% 55%,
+    1.6% 40%,
+    0 24%,
+    1.3% 10%
+  );
+  max-width: 100%;
+  text-wrap: balance;
+}
+
+.pb-blurb {
+  max-width: none;
+}
+.pb-tags {
+  margin-top: 2px;
+}
+.pb-visit {
+  margin-top: 4px;
+}
+
+/* "Nine more, all live.": the setlist as real links */
+.pb-rest {
+  width: min(430px, 36vw);
+  gap: 14px;
+}
+.pb-rest-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 820;
+  font-stretch: 112%;
+  font-size: clamp(1.6rem, 2.3vw, 2.2rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--paper);
+}
+.pb-rest-title em {
+  font-family: var(--font-script);
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+  font-size: 1.22em;
+  line-height: 0.8;
+  padding: 0 0.06em 0 0.02em;
+  color: var(--amber-hot);
+}
+.pb-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+.pb-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+.pb-num {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--fg-faint);
+}
+.pb-list a {
+  color: var(--fg);
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.42;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+.pb-list a:hover,
+.pb-list a:focus-visible {
+  color: var(--paper-2);
+  text-decoration: underline;
+  text-decoration-color: var(--signal);
+}
+.pb-arrow {
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.pb-hello {
+  margin-top: 2px;
+}
+
+/* tablets / narrow landscape: a touch narrower copy */
+@media (orientation: landscape) and (max-width: 1100px) {
+  .pb-card {
+    width: min(360px, 38vw);
+  }
+  .pb-rest {
+    width: min(380px, 40vw);
+  }
+}
+
+/* portrait (phones, tablets upright): the headline up top, cards in the bottom band */
+@media (orientation: portrait) {
+  .pb-intro {
+    top: var(--safe-top);
+    right: var(--gutter);
+    max-width: none;
+    transform: none;
+    gap: 14px;
+  }
+  .pb-title {
+    font-size: clamp(2.5rem, 11vw, 4.6rem);
+  }
+  .pb-card {
+    top: auto;
+    bottom: var(--safe-bottom);
+    right: var(--gutter);
+    width: auto;
+    max-width: 640px;
+    transform: none;
+    gap: 9px;
+    padding: 16px 18px;
+  }
+  .pb-name {
+    font-size: clamp(1.35rem, 6vw, 2rem);
+    padding: 6px 14px 5px;
+  }
+  .pb-blurb {
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .pb-rest {
+    width: auto;
+    gap: 11px;
+  }
+  .pb-rest-title {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+  }
+  .pb-list {
+    gap: 1px;
+  }
+  .pb-list a {
+    font-size: 14.5px;
+    line-height: 1.4;
+  }
+}
+@media (orientation: portrait) and (min-width: 600px) {
+  .pb-list {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 22px;
+  }
+}
+@media (orientation: portrait) and (max-height: 700px) {
+  .pb-card {
+    gap: 7px;
+    padding: 13px 15px;
+  }
+  .pb-chip {
+    display: none;
+  }
+  .pb-blurb {
+    font-size: 13.5px;
+    line-height: 1.42;
+  }
+  .pb-list a {
+    font-size: 13.5px;
+    line-height: 1.34;
+  }
+}
+
+/* short landscape (phones sideways after "Continue anyway", 200% zoom):
+   every panel fits between the thinner chrome bands */
+@media (orientation: landscape) and (max-height: 500px) {
+  .pb-intro {
+    gap: 10px;
+    max-width: 46vw;
+  }
+  .pb-title {
+    font-size: clamp(2rem, 5.4vw, 3.2rem);
+  }
+  .pb-card {
+    width: min(340px, 42vw);
+    max-height: calc(100% - var(--safe-top) - var(--safe-bottom) - 6px);
+    gap: 6px;
+    padding: 11px 15px 12px;
+  }
+  .pb-chip {
+    display: none;
+  }
+  .pb-card .hud-label {
+    font-size: 10.5px;
+    line-height: 1.35;
+  }
+  .pb-name {
+    font-size: clamp(1.1rem, 2.6vw, 1.4rem);
+    padding: 5px 12px 4px;
+    margin-bottom: 0;
+  }
+  .pb-blurb {
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  .pb-card .hud-tag {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  .pb-card .hud-btn {
+    padding: 8px 14px;
+    font-size: 11px;
+  }
+  .pb-visit {
+    margin-top: 0;
+  }
+  .pb-rest {
+    width: auto;
+    max-width: min(540px, 66vw);
+    gap: 7px;
+  }
+  .pb-rest-title {
+    font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+  }
+  .pb-list {
+    grid-template-columns: max-content max-content;
+    grid-template-rows: repeat(5, auto);
+    grid-auto-flow: column;
+    gap: 0 22px;
+  }
+  .pb-list a {
+    font-size: 12.5px;
+    line-height: 1.34;
+    white-space: nowrap;
+  }
+  .pb-num {
+    font-size: 10px;
+  }
+}

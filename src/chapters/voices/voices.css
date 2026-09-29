@@ -1,0 +1,309 @@
+/* ------------------------------------------------------------------
+   The Picks (voices) — the quote card beside the guitar's neck.
+   Desktop / short landscape: a column on the left over the dark planks.
+   Portrait: a plate in the bottom band, the pick framed above it.
+   Intro and card share one grid cell, so the column never jumps.
+   Every selector is scoped under .stage-voices.
+   ------------------------------------------------------------------ */
+
+/* the chrome bands, measured by index.ts to frame the pick */
+.stage-voices .pk-probe {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  top: var(--safe-top);
+  bottom: var(--safe-bottom);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.stage-voices .pk-copy {
+  position: absolute;
+  left: calc(var(--gutter) + clamp(0px, 1.6vw, 28px));
+  top: var(--safe-top);
+  bottom: var(--safe-bottom);
+  width: min(500px, 37vw);
+  display: grid;
+  align-content: center;
+}
+.stage-voices .pk-copy > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+/* ---------------- intro ---------------- */
+
+.stage-voices .pk-intro {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: clamp(14px, 2.2vh, 22px);
+  visibility: hidden;
+  transition: visibility 0s linear 0.3s;
+}
+.stage-voices .pk-intro.is-on {
+  visibility: visible;
+  transition-delay: 0s;
+}
+/* a soft pool of shadow behind the headline (the planks are dark already) */
+.stage-voices .pk-intro::before {
+  content: '';
+  position: absolute;
+  left: -18%;
+  right: -22%;
+  top: -30%;
+  bottom: -30%;
+  background: radial-gradient(closest-side, rgba(6, 4, 3, 0.66), rgba(6, 4, 3, 0));
+  pointer-events: none;
+  z-index: -1;
+}
+.stage-voices .pk-eyebrow {
+  opacity: 0;
+  transform: translate3d(0, 6px, 0);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+.stage-voices .pk-intro.is-on .pk-eyebrow {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s ease 0.05s,
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.05s;
+}
+.stage-voices .pk-title {
+  font-size: clamp(2.5rem, 4.8vw, 4.8rem);
+}
+
+/* ---------------- the quote card ---------------- */
+
+.stage-voices .pk-card {
+  padding: clamp(20px, 2.6vh, 28px) clamp(20px, 2vw, 30px) clamp(20px, 2.6vh, 26px);
+  background: rgba(11, 8, 6, 0.9);
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s ease,
+    visibility 0s linear 0.3s;
+}
+.stage-voices .pk-card.is-on {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity 0.45s ease,
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 0s;
+}
+
+/* the voices share one cell: the stack is as tall as the longest. A quick
+   swap: the old voice fades in ~0.2 s, the new one comes in once it's gone
+   (never two quotes on top of each other; words back within ~0.5 s) */
+.stage-voices .pk-stack {
+  display: grid;
+}
+.stage-voices .pk-fig {
+  grid-area: 1 / 1;
+  margin: 0;
+  align-self: start;
+  opacity: 0;
+  transform: translate3d(0, 5px, 0);
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s ease,
+    visibility 0s linear 0.22s;
+}
+.stage-voices .pk-fig.is-on {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity 0.34s ease 0.18s,
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.18s,
+    visibility 0s linear 0s;
+}
+
+/* head: the pick's miniature, then NN / 08 */
+.stage-voices .pk-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 clamp(14px, 2vh, 20px);
+}
+.stage-voices .pk-badge {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 46px;
+  /* the 351 silhouette as a fallback until the miniature is drawn */
+  background: var(--pk-bg, #3a1606);
+  clip-path: polygon(50% 100%, 20% 72%, 4% 38%, 6% 14%, 20% 2%, 50% 0%, 80% 2%, 94% 14%, 96% 38%, 80% 72%);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+.stage-voices .pk-badge.has-mini {
+  background: none;
+  clip-path: none;
+}
+.stage-voices .pk-mini {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+}
+.stage-voices .pk-badge.has-mini .pk-mini {
+  opacity: 1;
+}
+.stage-voices .pk-idx {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.stage-voices .pk-idx::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: var(--burst-grad);
+}
+.stage-voices .pk-n {
+  color: var(--fg);
+}
+
+.stage-voices .pk-q {
+  margin: 0;
+  font-size: clamp(1.28rem, 1.95vw, 1.9rem);
+  line-height: 1.26;
+  /* hang the opening mark in the margin */
+  text-indent: -0.42em;
+}
+.stage-voices .pk-fig--long .pk-q {
+  font-size: clamp(1.18rem, 1.72vw, 1.7rem);
+}
+
+.stage-voices .pk-who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: clamp(16px, 2.2vh, 22px) 0 0;
+  padding-top: clamp(12px, 1.6vh, 16px);
+  border-top: 1px solid var(--line);
+}
+.stage-voices .pk-name {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--fg);
+}
+/* the company, set like the pick's print: wide caps in sunburst amber */
+.stage-voices .pk-co {
+  font-family: var(--font-display);
+  font-weight: 760;
+  font-stretch: 115%;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+/* ---------------- portrait: the pick above, a plate in the bottom band ---------------- */
+
+@media (max-aspect-ratio: 1/1) {
+  .stage-voices .pk-copy {
+    left: var(--gutter);
+    right: var(--gutter);
+    top: auto;
+    width: auto;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .stage-voices .pk-intro {
+    align-content: end;
+    gap: 12px;
+    padding: 0 4px 6px;
+  }
+  .stage-voices .pk-intro::before {
+    left: -10%;
+    right: -10%;
+    top: -40%;
+    bottom: -20%;
+  }
+  .stage-voices .pk-title {
+    font-size: clamp(2.3rem, 11vw, 4.4rem);
+    max-width: 8.5em;
+  }
+  .stage-voices .pk-card {
+    align-self: end;
+    padding: 16px 18px 16px;
+  }
+  .stage-voices .pk-head {
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .stage-voices .pk-badge {
+    width: 32px;
+    height: 37px;
+  }
+  .stage-voices .pk-q {
+    font-size: clamp(1.02rem, 4.5vw, 1.5rem);
+    line-height: 1.28;
+  }
+  .stage-voices .pk-fig--long .pk-q {
+    font-size: clamp(0.98rem, 4.2vw, 1.4rem);
+  }
+  .stage-voices .pk-who {
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+  .stage-voices .pk-name {
+    font-size: 14px;
+  }
+}
+
+/* ---------------- short landscape (phones sideways, 200% zoom) ---------------- */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .stage-voices .pk-copy {
+    left: var(--gutter);
+    width: min(430px, 48vw);
+  }
+  .stage-voices .pk-intro {
+    gap: 10px;
+  }
+  .stage-voices .pk-title {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+  }
+  .stage-voices .pk-card {
+    padding: 12px 16px 12px;
+  }
+  .stage-voices .pk-head {
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .stage-voices .pk-badge {
+    width: 24px;
+    height: 28px;
+  }
+  .stage-voices .pk-q,
+  .stage-voices .pk-fig--long .pk-q {
+    font-size: clamp(0.88rem, 2.1vw, 1.04rem);
+    line-height: 1.28;
+  }
+  .stage-voices .pk-who {
+    margin-top: 8px;
+    padding-top: 6px;
+  }
+  .stage-voices .pk-name {
+    font-size: 13px;
+  }
+  .stage-voices .pk-co {
+    font-size: 11px;
+  }
+}

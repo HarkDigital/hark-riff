@@ -6,37 +6,43 @@ import { CONCEPT_TAG, WORDMARK, markSvg } from './mark'
 import { holdInert, releaseInert } from './inert'
 import { mountRotateGate } from './rotate'
 import { bindScene, calmUi, holdScene, readMotion, releaseScene, rememberMotion } from './prefs'
+import { publishTextures } from './texture'
 
 /*
- * Persistent chrome — OPAL: the gallery's own wall text. Quiet and exact:
- * white type, hairlines, and color only where something is ON — the room
- * you're in lights a fine hairline with the accent gradient (rose → lilac →
- * periwinkle), a switch that's on lights its little glass tile. The Hark mark
- * is always white. Nothing sits on a blur (backdrop-filter over the canvas
- * costs 15–25% of the frame): soft dark scrims at the top and bottom edges,
- * small dark backing plates and a dark halo on every letter keep the 11px
- * text at >= 4.5:1 over bright light boxes and black rooms alike.
+ * Persistent chrome — RIFF: the gear at the edge of the stage. Everything
+ * sits on small OPAQUE PLATES of black tolex with a cream piping line (never
+ * a blur over the canvas: backdrop-filter costs 15–25% of the frame), so the
+ * 11px caps hold >= 4.5:1 over hot beams and black stage alike. Warm dark
+ * scrims at the top and bottom edges settle the bands.
  *
- *   top-left      the Hark mark (white) + "Hark.Digital" (Hanken Grotesk; the
- *                 dot is an opal bead) + "Concept · Opal" (SITE.name, Red Hat
- *                 Mono) — a tag, never part of the name (→ the start)
- *   top-right     Work · Services · Contact (mono caps; the room on screen
- *                 lights a hairline under its name) + "Start a project".
- *                 ≤ 820px: "Menu" opens a full-screen dark dialog (focus moves
- *                 in, Tab is trapped, Escape closes, the page behind is inert
- *                 and the scene pauses once covered; focus returns to Menu).
- *   bottom-left   Sound and Motion: toggle buttons (aria-pressed), each with a
- *                 small glass tile that lights when on. Motion off sets
- *                 engine.motion = false + html.motion-off, is remembered
- *                 (localStorage via prefs.ts) and starts off under
+ *   top-left      the Hark mark (cream, never tinted) + "Hark.Digital" (Anybody,
+ *                 heavy and a touch wide, like an amp nameplate; the dot is an
+ *                 amber JEWEL LAMP) + the tag "Concept · Riff" (Riff in the
+ *                 Yellowtail headstock script) on its own plate (→ the start)
+ *   top-right     Work · Services · Contact on one plate, like an amp's channel
+ *                 strip: the channel on screen lights its amber jewel LED —
+ *                 + "Start a project" (the cream-gold hud-btn). ≤ 820px: "Menu"
+ *                 (a strings glyph) opens a full-screen SETLIST dialog (focus
+ *                 moves in, Tab is trapped, Escape closes, the page behind is
+ *                 inert and the scene pauses once covered; focus returns to Menu).
+ *   bottom-left   Amp and Motion: two chrome BAT-HANDLE TOGGLE SWITCHES with a
+ *                 jewel pilot lamp each (aria-pressed buttons). The lever flips
+ *                 up for On (a quick click through the nut), the jewel lights
+ *                 amber. Amp: On / Standby (the sound, off by default). Motion
+ *                 off sets engine.motion = false + html.motion-off, is
+ *                 remembered (localStorage via prefs.ts) and starts off under
  *                 prefers-reduced-motion.
- *   bottom-right  "03 / 07 — Spectrum · Services" + one hairline pip per
- *                 chapter (24x24 buttons, named), the room on screen lit.
+ *   bottom-right  "03 / 07  UP TO ELEVEN · Services" over a little FRETBOARD:
+ *                 rosewood between cream binding, a bone nut, nickel fret
+ *                 wires, and one 24x24 cell per chapter (a button, named) with
+ *                 a mother-of-pearl dot inlay — the chapter on screen lights
+ *                 its dot amber (like a side-marker LED), the ones behind you
+ *                 stay pearl, the ones ahead are dim.
  *   The bottom band is one landmark (<aside> "Preferences and chapters"), so
- *   landmark navigation reaches Sound / Motion. The readout is NOT a live
+ *   landmark navigation reaches Amp / Motion. The readout is NOT a live
  *   region (scrolling, a reader's cursor and each Tab into a chapter would
  *   queue "04 / 07 …" on top of the heading just reached); a quiet sr-only
- *   status names the room only after a pip / link was activated without
+ *   status names the chapter only after a pip / link was activated without
  *   moving focus to its heading (a tap, a click).
  *
  * API used by main.ts: createChrome(root, engine, sound) → { update(frame, state) }.
@@ -58,9 +64,9 @@ const MENU_QUERY = '(max-width: 820px)'
 const pad = (n: number) => String(n).padStart(2, '0')
 const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!)
 
-/* glyphs (decorative): two hairlines / a crossed pair */
-const MENU_IC = `<svg class="ch-ic" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M1 3.5h18M7 8.5h12"/></svg>`
-const CLOSE_IC = `<svg class="ch-ic" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M5 1l10 10M15 1L5 11"/></svg>`
+/* glyphs (decorative): three strings, wound to plain (heavy → light gauge) / a crossed pair */
+const MENU_IC = `<svg class="ch-ic" viewBox="0 0 22 14" aria-hidden="true" focusable="false"><path d="M1 2.5h20" stroke-width="2.1"/><path d="M1 7h20" stroke-width="1.5"/><path d="M1 11.5h20" stroke-width="1"/></svg>`
+const CLOSE_IC = `<svg class="ch-ic" viewBox="0 0 22 14" aria-hidden="true" focusable="false"><path d="M6 1.5l10 11M16 1.5l-10 11" stroke-width="1.6"/></svg>`
 
 export function createChrome(root: HTMLElement, engine: Engine, sound: Sound) {
   const slots = engine.slots
@@ -74,19 +80,22 @@ export function createChrome(root: HTMLElement, engine: Engine, sound: Sound) {
   bindScene(engine)
   mountRotateGate(shown => (shown ? holdScene('rotate') : releaseScene('rotate')))
 
+  // the tolex grain on the plates and the grille cloth behind the setlist menu
+  publishTextures(['tolex', 'wheat'])
+
   // ---------------------------------------------------------------- markup
 
   const brandInner = `<span class="ch-mark" aria-hidden="true">${markSvg('ch-mark-svg')}</span>
       <span class="ch-brand-text" aria-hidden="true">${WORDMARK}${CONCEPT_TAG}</span>`
 
   const links = NAV.filter(id => indexOf(id) >= 0)
-    .map(id => `<li><a class="ch-link" href="#${id}" data-go="${id}"><span>${biz(id)}</span><i class="ch-hair" aria-hidden="true"></i></a></li>`)
+    .map(id => `<li><a class="ch-link" href="#${id}" data-go="${id}"><i class="ch-led" aria-hidden="true"></i><span>${biz(id)}</span></a></li>`)
     .join('')
 
   const pips = slots
     .map(
       (s, i) =>
-        `<li><button type="button" class="ch-pip" data-go="${s.def.id}" aria-label="${pad(i + 1)}: ${esc(s.def.label)} (${esc(biz(s.def.id, s.def.label))})"><i class="ch-hair" aria-hidden="true"></i></button></li>`,
+        `<li><button type="button" class="ch-pip" data-go="${s.def.id}" aria-label="${pad(i + 1)}: ${esc(s.def.label)} (${esc(biz(s.def.id, s.def.label))})"><i class="ch-dot" aria-hidden="true"></i></button></li>`,
     )
     .join('')
 
@@ -95,7 +104,7 @@ export function createChrome(root: HTMLElement, engine: Engine, sound: Sound) {
       (s, i) =>
         `<li><a class="ch-ml" href="#${s.def.id}" data-go="${s.def.id}" aria-label="${esc(biz(s.def.id, s.def.label))}, ${i + 1} of ${total}: ${esc(s.def.label)}">
           <span class="ch-ml-n" aria-hidden="true">${pad(i + 1)}</span>
-          <i class="ch-hair ch-ml-hair" aria-hidden="true"></i>
+          <i class="ch-led ch-ml-led" aria-hidden="true"></i>
           <span class="ch-ml-name" aria-hidden="true">${esc(biz(s.def.id, s.def.label))}</span>
           <span class="ch-ml-lab" aria-hidden="true">${esc(s.def.label)}</span>
         </a></li>`,
@@ -103,11 +112,15 @@ export function createChrome(root: HTMLElement, engine: Engine, sound: Sound) {
     .join('')
 
   let motionOn = readMotion()
+  // an amp-panel toggle: the jewel, the name, the bat-handle switch and its
+  // two engraved legends (On above, Standby / Off below) — the lever points
+  // at the one that's lit; the button's name is the label, its state aria-pressed
   const tgl = (kind: 'sound' | 'motion', extra = '') => {
     const on = kind === 'sound' ? sound.enabled : motionOn
     const k = kind === 'sound' ? MICROCOPY.audio : MICROCOPY.motion
-    const st = kind === 'sound' ? (on ? MICROCOPY.audioOn : MICROCOPY.audioOff) : on ? MICROCOPY.motionOn : MICROCOPY.motionOff
-    return `<button class="ch-tgl ch-tgl--${kind}${extra}" type="button" data-${kind}-toggle aria-pressed="${on}"><i class="ch-tgl-tile" aria-hidden="true"></i><span class="ch-tgl-k">${k}</span><span class="ch-tgl-st" aria-hidden="true">${st}</span></button>`
+    const up = kind === 'sound' ? MICROCOPY.audioOn : MICROCOPY.motionOn
+    const down = kind === 'sound' ? MICROCOPY.audioOff : MICROCOPY.motionOff
+    return `<button class="ch-tgl ch-tgl--${kind}${extra}" type="button" data-${kind}-toggle aria-pressed="${on}"><i class="ch-jewel" aria-hidden="true"></i><span class="ch-tgl-k">${k}</span><i class="ch-sw" aria-hidden="true"><i class="ch-sw-bat"></i></i><span class="ch-tgl-lg" aria-hidden="true"><span class="ch-tgl-up">${up}</span><span class="ch-tgl-dn">${down}</span></span></button>`
   }
 
   root.innerHTML = `
@@ -127,13 +140,13 @@ export function createChrome(root: HTMLElement, engine: Engine, sound: Sound) {
       <div class="ch-prefs" role="group" aria-label="Preferences">${tgl('sound')}${tgl('motion')}</div>
       <div class="ch-read">
         <p class="ch-read-line"><span class="ch-read-n"><b>01</b> / ${pad(total)}</span><span class="ch-read-sep" aria-hidden="true"> — </span><span class="ch-read-l"></span><span class="ch-read-b"></span></p>
-        <nav class="ch-pips" aria-label="Chapters"><ol>${pips}</ol></nav>
+        <nav class="ch-pips" aria-label="Chapters"><ol class="ch-neck">${pips}</ol></nav>
         <p class="sr-only" role="status" data-ch-status></p>
       </div>
     </aside>
 
     <div class="ch-menu" id="ch-menu" role="dialog" aria-modal="true" aria-label="Menu" data-lenis-prevent hidden>
-      <div class="ch-menu-glow" aria-hidden="true"></div>
+      <div class="ch-menu-cloth" aria-hidden="true"></div>
       <div class="ch-menu-top">
         <span class="ch-brand ch-menu-brand" aria-hidden="true">${brandInner}</span>
         <button class="ch-menu-btn ch-menu-close" type="button"><span>Close</span>${CLOSE_IC}</button>
@@ -204,11 +217,7 @@ export function createChrome(root: HTMLElement, engine: Engine, sound: Sound) {
   // ---------------------------------------------------------------- sound
 
   const syncSound = (on: boolean) => {
-    for (const b of soundBtns) {
-      b.setAttribute('aria-pressed', String(on))
-      const st = b.querySelector('.ch-tgl-st')
-      if (st) st.textContent = on ? MICROCOPY.audioOn : MICROCOPY.audioOff
-    }
+    for (const b of soundBtns) b.setAttribute('aria-pressed', String(on))
   }
   for (const b of soundBtns) b.addEventListener('click', () => sound.toggle())
   sound.onChange.push(syncSound)
@@ -219,11 +228,7 @@ export function createChrome(root: HTMLElement, engine: Engine, sound: Sound) {
   const syncMotion = () => {
     document.documentElement.classList.toggle('motion-off', !motionOn)
     engine.motion = motionOn
-    for (const b of motionBtns) {
-      b.setAttribute('aria-pressed', String(motionOn))
-      const st = b.querySelector('.ch-tgl-st')
-      if (st) st.textContent = motionOn ? MICROCOPY.motionOn : MICROCOPY.motionOff
-    }
+    for (const b of motionBtns) b.setAttribute('aria-pressed', String(motionOn))
     window.dispatchEvent(new CustomEvent('hark:motion', { detail: { on: motionOn } }))
   }
   for (const b of motionBtns)

@@ -9,19 +9,20 @@ import { releaseScene } from './prefs'
 /*
  * The plain HTML version, for browsers without WebGL2 (and the last resort
  * if boot fails or the GPU context is gone for good): every chapter's copy,
- * in story order, visible — set as the gallery's EXHIBITION CATALOG. A
- * black page, thin Hanken Grotesk headings whose last word is the Cormorant
- * italic accent (lit by the rose → lilac → periwinkle gradient), Hanken for
- * the words and Red Hat Mono for the small print. Each chapter is a numbered
- * room with a wall label in the margin ("Room 03 · Spectrum", the room's
- * name in Cormorant italic, a fine hairline of light); the services and the
- * process read as the catalog's numbered entries, the quotes hang as wall
- * text, the figures are thin lit numerals. The room numbers, hairlines and
- * the colophon are decorative (aria-hidden or plainly not claims); the copy
- * is the live site's, verbatim, from srContent (buildChapterCopy). Links
- * stay underlined. Nothing here moves. Landmarks: the header (banner, with
- * the Primary nav) and the footer (contentinfo) sit beside <main> (#track),
- * which holds only the rooms.
+ * in story order, visible — set as a TOUR POSTER / SETLIST: one long sheet
+ * of aged cream stock gaffer-taped to the black stage wall. Anybody heavy
+ * and wide for the headlines (gig-poster caps), the last word of each in the
+ * Yellowtail script in oxblood (the headstock logo), Instrument Sans for the
+ * words, Spline Sans Mono for the small print. Each chapter is a numbered
+ * line of the setlist ("01", its name in script, a marker rule); the
+ * services and the process read as the setlist's numbered songs, the quotes
+ * as pull quotes, the figures as big poster numerals. The Hark mark stays
+ * cream on a black badge (never tinted). The numbers, rules, tape and the
+ * colophon are decorative (aria-hidden or plainly not claims); the copy is
+ * the live site's, verbatim, from srContent (buildChapterCopy). Links stay
+ * underlined. Nothing here moves. Landmarks: the header (banner, with the
+ * Primary nav) and the footer (contentinfo) sit beside <main> (#track),
+ * which holds only the chapters.
  */
 export function renderFallback(root: HTMLElement) {
   document.documentElement.classList.add('no-webgl')
@@ -46,6 +47,7 @@ export function renderFallback(root: HTMLElement) {
   const header = document.createElement('header')
   header.className = 'fb-top fb-band'
   header.innerHTML = `
+    <i class="fb-tape fb-tape--l" aria-hidden="true"></i><i class="fb-tape fb-tape--r" aria-hidden="true"></i>
     <a class="fb-brand" href="#hero" aria-label="${BRAND.name}, top of the page">
       <span class="fb-mark" aria-hidden="true">${markSvg('fb-mark-svg')}</span>
       <span class="fb-brand-text" aria-hidden="true">${WORDMARK}${CONCEPT_TAG}</span>
@@ -58,16 +60,17 @@ export function renderFallback(root: HTMLElement) {
     </nav>`
   const footer = document.createElement('footer')
   footer.className = 'fb-foot fb-band'
-  // a catalog's colophon: what it is set in (true of this page), no claims
+  // a poster's colophon: what it is set in (true of this page), no claims
   footer.innerHTML = `
-    <span class="fb-foot-mark" aria-hidden="true">${markSvg('fb-foot-svg')}</span>
+    <span class="fb-mark fb-foot-mark" aria-hidden="true">${markSvg('fb-foot-svg')}</span>
     <p class="fb-credit">${MICROCOPY.signalEyebrow}</p>
-    <p class="fb-colophon">Set in Hanken Grotesk, <em>Cormorant Garamond</em> and Red Hat Mono.</p>`
+    <p class="fb-colophon">Set in Anybody, <em>Yellowtail</em>, Instrument Sans and Spline Sans Mono.</p>
+    <i class="fb-tape fb-tape--b" aria-hidden="true"></i>`
   root.before(header)
   root.after(footer)
   const rooms = CHAPTERS.filter(c => CHAPTER_COPY_IDS.includes(c.id)).length
   root.innerHTML = `<div class="fb fb-band">
-    <p class="fb-kicker" aria-hidden="true"><i></i>Catalog · ${rooms === 7 ? 'Seven' : String(rooms)} rooms</p>
+    <p class="fb-kicker" aria-hidden="true"><i></i>The setlist · ${String(rooms).padStart(2, '0')}</p>
     <div class="fb-main" id="fb-main" tabindex="-1"></div>
   </div>`
 
@@ -104,7 +107,7 @@ export function renderFallback(root: HTMLElement) {
     })
     accentHeading(copy)
     markStats(copy)
-    // the catalog's entry numbers for numbered lists (the <ol> already says it)
+    // the setlist's numbers for numbered lists (the <ol> already says it)
     copy.querySelectorAll('ol > li > h3').forEach(h => {
       const li = h.parentElement!
       const n = document.createElement('span')
@@ -121,12 +124,12 @@ export function renderFallback(root: HTMLElement) {
       heading.id = `fb-${id}-title`
       sec.setAttribute('aria-labelledby', heading.id)
     }
-    // the wall label (decorative): "Room 03 · Spectrum"
+    // the setlist line (decorative): "03", then the chapter's name in script
     const label = CHAPTERS.find(c => c.id === id)?.label
     const wall = document.createElement('p')
     wall.className = 'fb-wall'
     wall.setAttribute('aria-hidden', 'true')
-    wall.innerHTML = `<span class="fb-wall-n">Room ${String(i + 1).padStart(2, '0')}</span>${label ? `<em>${label}</em>` : ''}<i></i>`
+    wall.innerHTML = `<span class="fb-wall-n">${String(i + 1).padStart(2, '0')}</span>${label ? `<em>${label}</em>` : ''}<i></i>`
     sec.appendChild(wall)
     const body = document.createElement('div')
     body.className = 'fb-room-body'
@@ -138,9 +141,9 @@ export function renderFallback(root: HTMLElement) {
 }
 
 /**
- * The heading's last word becomes the room's accent: Cormorant italic, lit by
- * the gradient ("Say <em>hello.</em>"). Only the markup changes; the heading
- * reads exactly as before.
+ * The heading's last word becomes the accent: the Yellowtail script in
+ * oxblood ("Say <em>hello.</em>"). Only the markup changes; the heading reads
+ * exactly as before.
  */
 function accentHeading(copy: HTMLElement) {
   const h = copy.querySelector<HTMLElement>('h1, h2')
@@ -155,9 +158,9 @@ function accentHeading(copy: HTMLElement) {
 }
 
 /**
- * The figures (10 years, $1M+, 15, 24/7) are thin lit numerals: each one set
- * in a <strong> the CSS lights. Only the markup changes; the words stay the
- * live copy's.
+ * The figures (10 years, $1M+, 15, 24/7) are big poster numerals: each one
+ * set in a <strong> the CSS styles. Only the markup changes; the words stay
+ * the live copy's.
  */
 function markStats(copy: HTMLElement) {
   for (const n of copy.querySelectorAll<HTMLElement>('p, li')) {

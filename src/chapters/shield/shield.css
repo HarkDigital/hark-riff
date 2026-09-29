@@ -1,0 +1,293 @@
+/* SHIELD · Feedback — the copy column on the left (landscape) or in the
+   bottom band (portrait), the 24/7 legend plate hung off the amp's jewel
+   pilot lamp by a hairline. The clip-LED red lives only here. */
+
+.shield-frame {
+  position: absolute;
+  inset: 0;
+  padding: var(--safe-top) var(--gutter) var(--safe-bottom);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.shield-col {
+  position: relative;
+  width: min(500px, 40vw);
+  display: grid;
+  gap: 22px;
+}
+/* a soft stage-black scrim behind the headline (the scene is busy and lit behind it on some frames) */
+.shield-col::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -12%;
+  right: -18%;
+  top: -18%;
+  bottom: -8%;
+  background: radial-gradient(closest-side, rgba(10, 7, 6, 0.62), rgba(10, 7, 6, 0.3) 62%, rgba(10, 7, 6, 0));
+  pointer-events: none;
+}
+.shield-head {
+  display: grid;
+  gap: 16px;
+}
+
+/* the eyebrow's lamp is the clip LED here: steady red, never blinking */
+.shield-eyebrow {
+  line-height: 1.5;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+}
+.shield-eyebrow::before {
+  background: radial-gradient(circle at 35% 35%, #ffd2c4 0%, #ff5a44 42%, #8e2a22 100%);
+  box-shadow:
+    0 0 0 2px rgba(243, 230, 204, 0.16),
+    0 0 12px rgba(255, 90, 68, 0.75);
+  transition: box-shadow 0.8s ease;
+}
+/* while it squeals the clip LED burns a little hotter (steady, never blinking) */
+.is-hot .shield-eyebrow::before {
+  box-shadow:
+    0 0 0 2px rgba(243, 230, 204, 0.2),
+    0 0 18px rgba(255, 90, 68, 0.95);
+}
+
+.shield-title {
+  font-size: clamp(2.9rem, 6vw, 6.4rem);
+  line-height: 0.92;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.55);
+}
+
+.shield-panel {
+  display: grid;
+  gap: 18px;
+  padding: 22px 24px 24px;
+}
+.shield-body {
+  max-width: 44ch;
+}
+.shield-cta {
+  justify-self: start;
+}
+
+/* ---------------- the legend plate: brushed gold, engraved in ink, two screws */
+
+.shield-legend {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.shield-leader {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.shield-leader path {
+  fill: none;
+  stroke: var(--paper);
+  stroke-opacity: 0.7;
+  stroke-width: 1;
+}
+/* a ring round the jewel (the lamp itself is lit in 3D) */
+.shield-leader-dot {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(243, 230, 204, 0.7);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+.shield-plate {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 336px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 14px;
+  padding: 12px 16px 12px 14px;
+  border-radius: 3px;
+  color: #1a1208;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 244, 214, 0.07) 0 1px, rgba(90, 60, 20, 0.05) 1px 2px),
+    linear-gradient(180deg, #edd08e 0%, #d8b268 52%, #bf9650 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 230, 0.6),
+    inset 0 -1px 0 rgba(90, 58, 16, 0.45),
+    0 14px 40px rgba(0, 0, 0, 0.55);
+  will-change: transform;
+}
+/* two screws */
+.shield-plate::before,
+.shield-plate::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6dc 0%, #b39052 55%, #5a4218 100%);
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 10, 0.35);
+}
+.shield-plate::before {
+  left: 5px;
+}
+.shield-plate::after {
+  right: 5px;
+}
+.shield-plate-k {
+  font-family: var(--font-display);
+  font-weight: 880;
+  font-stretch: 120%;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  padding-left: 6px;
+  color: #1a1208;
+  text-shadow: 0 1px 0 rgba(255, 246, 220, 0.55);
+}
+.shield-plate-l {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 560;
+  font-size: 12.5px;
+  line-height: 1.38;
+  color: #1f1509;
+  padding-right: 6px;
+}
+
+/* ---------------- portrait: the column in the bottom band, the plate above it */
+@media (max-aspect-ratio: 20/21) {
+  .shield-frame {
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .shield-col {
+    width: min(560px, 100%);
+    gap: 16px;
+  }
+  /* portrait: a lower third, stage black rising behind the copy */
+  .shield-col::before {
+    left: 50%;
+    right: auto;
+    width: 100vw;
+    transform: translateX(-50%);
+    top: -64px;
+    bottom: calc(-1 * var(--safe-bottom));
+    background: linear-gradient(180deg, rgba(10, 7, 6, 0) 0, rgba(10, 7, 6, 0.78) 64px, rgba(10, 7, 6, 0.9) 100%);
+  }
+  .shield-title {
+    font-size: clamp(2.6rem, 9vw, 4.6rem);
+  }
+  .shield-plate {
+    width: min(360px, calc(100vw - 2 * var(--gutter)));
+  }
+}
+@media (max-width: 760px) and (orientation: portrait) {
+  .shield-frame {
+    padding-bottom: calc(var(--safe-bottom) + 6px);
+  }
+  .shield-col {
+    gap: 12px;
+  }
+  .shield-head {
+    gap: 10px;
+  }
+  .shield-title {
+    font-size: clamp(2.3rem, 11vw, 3rem);
+  }
+  .shield-panel {
+    gap: 12px;
+    padding: 15px 16px 16px;
+  }
+  .shield-body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .shield-cta {
+    padding: 11px 16px;
+  }
+  .shield-plate {
+    padding: 9px 14px 9px 12px;
+    column-gap: 12px;
+  }
+  .shield-plate-k {
+    font-size: 26px;
+  }
+  .shield-plate-l {
+    font-size: 12px;
+  }
+}
+@media (max-width: 760px) and (orientation: portrait) and (max-height: 700px) {
+  .shield-head {
+    gap: 8px;
+  }
+  .shield-title {
+    font-size: 2.1rem;
+  }
+  .shield-body {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .shield-panel {
+    padding: 13px 14px 14px;
+    gap: 10px;
+  }
+  .shield-cta {
+    padding: 9px 14px;
+    font-size: 11px;
+  }
+}
+
+/* ---------------- short landscape (phones sideways, 200% zoom): compact left column */
+@media (orientation: landscape) and (max-height: 500px) {
+  .shield-col {
+    width: min(390px, 47vw);
+    gap: 10px;
+  }
+  .shield-head {
+    gap: 6px;
+  }
+  .shield-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
+  .shield-title {
+    font-size: 2rem;
+  }
+  .shield-panel {
+    gap: 9px;
+    padding: 11px 14px 12px;
+  }
+  .shield-panel::before {
+    top: 4px;
+  }
+  .shield-body {
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+  .shield-cta {
+    padding: 8px 13px;
+    font-size: 11px;
+  }
+  .shield-plate {
+    width: 300px;
+    padding: 7px 12px 7px 10px;
+    column-gap: 10px;
+  }
+  .shield-plate-k {
+    font-size: 21px;
+  }
+  .shield-plate-l {
+    font-size: 11px;
+    line-height: 1.32;
+  }
+}

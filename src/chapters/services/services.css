@@ -1,0 +1,243 @@
+/* SERVICES · Up to Eleven — chapter-scoped layout (.sv-) */
+
+.sv-intro {
+  position: absolute;
+  left: var(--gutter);
+  top: var(--safe-top);
+  max-width: min(640px, calc(100vw - 2 * var(--gutter)));
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+/* two lines: "Eleven ways / to be heard." */
+.sv-head {
+  max-width: 7.2em;
+}
+
+/* the service card: a tolex plate with cream piping (hud-panel). All eleven
+   services sit stacked in ONE grid cell inside .sv-clip, top-aligned, so the
+   index row and the title never move between services; index.ts pins the
+   card's top edge where the tallest service puts it and glides .sv-clip's
+   height to the service shown. Opaque plate, no backdrop blur. */
+.sv-card {
+  position: absolute;
+  left: var(--gutter);
+  bottom: var(--safe-bottom);
+  width: min(440px, 36vw);
+  max-height: calc(100% - var(--safe-top) - var(--safe-bottom));
+  display: grid;
+  padding: 20px 24px 22px;
+  background: rgba(12, 8, 6, 0.93);
+}
+.sv-clip {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  transition: height 0.3s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+.sv-body {
+  grid-area: 1 / 1;
+  align-self: start;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* the index row: the number lit like a hot numeral on the dial, "/ 11", and a
+   volume wedge of eleven bars lit up to this service */
+.sv-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.sv-num {
+  font-family: var(--font-display);
+  font-weight: 860;
+  font-stretch: 118%;
+  font-size: 2.5rem;
+  line-height: 0.82;
+  letter-spacing: -0.02em;
+  color: var(--amber-hot);
+  text-shadow: 0 0 22px rgba(255, 140, 40, 0.42);
+  font-variant-numeric: tabular-nums;
+}
+.sv-of {
+  line-height: 1;
+  padding-bottom: 1px;
+  color: var(--fg-muted);
+}
+.sv-ladder {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 22px;
+  padding-bottom: 1px;
+}
+.sv-ladder i {
+  display: block;
+  width: 5px;
+  border-radius: 1px;
+  background: rgba(243, 230, 204, 0.16);
+}
+.sv-ladder i:nth-child(1) { height: 28%; }
+.sv-ladder i:nth-child(2) { height: 35%; }
+.sv-ladder i:nth-child(3) { height: 42%; }
+.sv-ladder i:nth-child(4) { height: 49%; }
+.sv-ladder i:nth-child(5) { height: 56%; }
+.sv-ladder i:nth-child(6) { height: 63%; }
+.sv-ladder i:nth-child(7) { height: 70%; }
+.sv-ladder i:nth-child(8) { height: 77%; }
+.sv-ladder i:nth-child(9) { height: 84%; }
+.sv-ladder i:nth-child(10) { height: 92%; }
+.sv-ladder i:nth-child(11) { height: 100%; }
+.sv-ladder i.is-on {
+  background: linear-gradient(180deg, #ffd98a 0%, #f2a33a 60%, #c4631f 100%);
+  box-shadow: 0 0 8px rgba(242, 163, 58, 0.35);
+}
+
+.sv-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 112%;
+  font-size: clamp(1.45rem, 2.1vw, 2.15rem);
+  line-height: 1.02;
+  letter-spacing: -0.018em;
+  color: var(--paper);
+  text-wrap: balance;
+}
+.sv-blurb {
+  max-width: none;
+}
+.sv-tags {
+  margin-top: 2px;
+}
+
+/* portrait (phones, tall tablets): the headline on top, the card owns the bottom band */
+@media (orientation: portrait) {
+  .sv-card {
+    right: var(--gutter);
+    width: auto;
+    max-width: 600px;
+    padding: 16px 18px 18px;
+  }
+  .sv-title {
+    font-size: clamp(1.35rem, 5.4vw, 2rem);
+  }
+}
+@media (orientation: portrait) and (min-width: 700px) {
+  .sv-card {
+    left: 50%;
+    right: auto;
+    width: min(600px, calc(100vw - 2 * var(--gutter)));
+    transform: translateX(-50%);
+  }
+}
+
+/* portrait (phones, tall tablets): the headline gets a readable plate over the head */
+@media (orientation: portrait) {
+  .sv-intro {
+    right: var(--gutter);
+    max-width: 600px;
+    gap: 12px;
+    padding: 16px 18px 18px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+}
+@media (orientation: portrait) and (min-width: 700px) {
+  .sv-intro {
+    right: auto;
+    padding: 22px 26px 26px;
+  }
+  .sv-intro .hud-h2 {
+    font-size: clamp(2.4rem, 6.4vw, 3.6rem);
+  }
+}
+@media (max-width: 760px) {
+  .sv-body {
+    gap: 9px;
+  }
+  .sv-row {
+    padding-bottom: 9px;
+  }
+  .sv-num {
+    font-size: 2rem;
+  }
+  .sv-blurb {
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+}
+@media (max-height: 700px) and (orientation: portrait) {
+  .sv-blurb {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .sv-num {
+    font-size: 1.75rem;
+  }
+  .sv-tags .hud-tag {
+    padding: 3px 8px;
+  }
+}
+
+/* short landscape (a phone sideways, 200% zoom): a compact card between the
+   chrome bands — smaller type, tight spacing; the headline plate hugs its words */
+@media (orientation: landscape) and (max-height: 500px) {
+  .sv-intro {
+    right: auto;
+    max-width: min(400px, calc(100vw - 2 * var(--gutter)));
+    gap: 8px;
+    padding: 12px 16px 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .sv-intro .hud-h2 {
+    font-size: clamp(1.5rem, 4.2vw, 2rem);
+  }
+  .sv-card {
+    width: min(390px, 46vw);
+    padding: 11px 15px 12px;
+    overflow: hidden;
+  }
+  .sv-body {
+    gap: 6px;
+  }
+  .sv-row {
+    padding-bottom: 6px;
+    gap: 8px;
+  }
+  .sv-num {
+    font-size: 1.5rem;
+  }
+  .sv-ladder {
+    height: 16px;
+  }
+  .sv-ladder i {
+    width: 4px;
+  }
+  .sv-title {
+    font-size: clamp(1.05rem, 2.3vw, 1.3rem);
+    line-height: 1.06;
+  }
+  .sv-blurb {
+    font-size: 12.5px;
+    line-height: 1.42;
+  }
+  .sv-tags {
+    gap: 4px;
+    margin-top: 0;
+  }
+  .sv-tags .hud-tag {
+    padding: 2px 6px;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+  }
+}

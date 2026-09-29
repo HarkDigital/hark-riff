@@ -1,0 +1,363 @@
+/* PROCESS · The Workbench — chapter-scoped layout (prefix: wb-) */
+
+/* ---------------- the intro: eyebrow + headline, top-left ---------------- */
+.wb-head {
+  position: absolute;
+  left: var(--gutter);
+  top: var(--safe-top);
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: min(760px, calc(100vw - 2 * var(--gutter)));
+}
+.wb-h2 {
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+}
+
+/* ---------------- the build sheet: bottom-left ---------------- */
+.wb-card {
+  position: absolute;
+  left: var(--gutter);
+  bottom: var(--safe-bottom);
+  width: min(400px, 34vw, calc(100vw - 2 * var(--gutter)));
+  padding: 16px 22px 20px;
+  display: grid;
+  gap: 12px;
+}
+.wb-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.wb-card-k {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+/* four LED segments, like an amp's level ladder: lit through the current step */
+.wb-meter {
+  display: inline-flex;
+  gap: 4px;
+}
+.wb-meter i {
+  display: block;
+  width: 18px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: rgba(243, 230, 204, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(243, 230, 204, 0.18);
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.wb-meter i.is-on {
+  background: #f2a33a;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 220, 160, 0.6),
+    0 0 8px rgba(242, 163, 58, 0.55);
+}
+
+/* the four pages share one grid cell: the plate keeps the tallest page's
+   height, so it never resizes (or blinks) between steps */
+.wb-pages {
+  display: grid;
+}
+.wb-page {
+  grid-area: 1 / 1;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.22s ease,
+    visibility 0s linear 0.22s;
+}
+.wb-page.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.3s ease 0.1s,
+    visibility 0s linear 0s;
+}
+.wb-num {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.wb-n {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber-hot);
+}
+.wb-of {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+.wb-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 840;
+  font-stretch: 120%;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  line-height: 0.95;
+  font-size: clamp(1.9rem, 2.6vw, 2.6rem);
+  color: var(--paper);
+}
+.wb-text {
+  max-width: 38ch;
+}
+
+/* ---------------- the hang tag (stats) ---------------- */
+/* a cream card tag on a thread from the tuner: dark ink on cream, the top
+   corners clipped, a brass eyelet; real DOM text */
+.wb-tag {
+  position: absolute;
+  left: var(--gutter);
+  bottom: var(--safe-bottom);
+  width: min(340px, 30vw, calc(100vw - 2 * var(--gutter)));
+  padding: 40px 24px 18px;
+  color: #1c120a;
+  background:
+    radial-gradient(120% 70% at 20% 0%, rgba(255, 250, 236, 0.9), rgba(255, 250, 236, 0) 60%),
+    linear-gradient(172deg, #f6ead2 0%, #efdfc0 60%, #e7d3ae 100%);
+  -webkit-clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%, 0 22px);
+  clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%, 0 22px);
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+/* the brass eyelet round the punched hole */
+.wb-eyelet {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  width: 15px;
+  height: 15px;
+  margin-left: -7.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1a100a 0 3.6px, #8a6a2a 4.2px, #e6c47c 5.4px, #9a7532 7.5px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.wb-tag-k {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid #1c120a;
+}
+.wb-tag-brand {
+  font-family: var(--font-display);
+  font-weight: 820;
+  font-stretch: 118%;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+.wb-tag-kind {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(28, 18, 10, 0.78);
+}
+.wb-stats {
+  display: grid;
+  gap: 0;
+}
+.wb-stat {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0 12px;
+}
+/* perforation between rows */
+.wb-stat + .wb-stat {
+  background: repeating-linear-gradient(90deg, rgba(28, 18, 10, 0.45) 0 5px, transparent 5px 9px) top / 100% 1px no-repeat;
+}
+.wb-stat-v {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 860;
+  font-stretch: 120%;
+  font-size: clamp(1.7rem, 2.3vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: #1c120a;
+}
+.wb-stat-l {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 460;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(28, 18, 10, 0.8);
+}
+.wb-tag-foot {
+  margin: 8px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(28, 18, 10, 0.35);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(28, 18, 10, 0.78);
+  text-wrap: balance;
+}
+
+/* the thread (SVG over the whole stage, under the tag) */
+.wb-thread {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.wb-thread path {
+  fill: none;
+  stroke: #efe0c2;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+}
+
+/* ---------------- portrait: copy top and bottom, the bench between ---------------- */
+@media (orientation: portrait) {
+  .wb-head {
+    right: var(--gutter);
+    max-width: none;
+    gap: 10px;
+  }
+  .wb-h2 {
+    max-width: none;
+    font-size: clamp(1.9rem, 8.2vw, 3.4rem);
+  }
+  .wb-card {
+    right: var(--gutter);
+    width: auto;
+    max-width: 560px;
+    padding: 12px 18px 16px;
+    gap: 10px;
+  }
+  .wb-card-top {
+    padding-bottom: 8px;
+  }
+  .wb-page {
+    gap: 6px;
+  }
+  .wb-title {
+    font-size: clamp(1.6rem, 7vw, 2.4rem);
+  }
+  .wb-tag {
+    right: var(--gutter);
+    width: auto;
+    max-width: 560px;
+    padding: 34px 18px 12px;
+  }
+  .wb-tag-k {
+    margin-bottom: 4px;
+    padding-bottom: 8px;
+  }
+  /* compact rows: the figure left, its label right */
+  .wb-stat {
+    grid-template-columns: 7.4em 1fr;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 0 9px;
+  }
+  .wb-stat-v {
+    font-size: 1.2rem;
+    white-space: nowrap;
+  }
+  .wb-stat-l {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .wb-tag-foot {
+    margin-top: 4px;
+    padding-top: 8px;
+  }
+}
+@media (orientation: portrait) and (max-height: 700px) {
+  .wb-card .wb-text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .wb-stat-l {
+    font-size: 12.5px;
+    line-height: 1.38;
+  }
+  .wb-tag-foot {
+    display: none;
+  }
+}
+
+/* ---------------- short landscape (a phone sideways): compact, between the 52 px bands ---------------- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .wb-head {
+    gap: 6px;
+  }
+  .wb-h2 {
+    max-width: 16ch;
+    font-size: clamp(1.45rem, 3.8vw, 2rem);
+  }
+  .wb-card {
+    width: min(360px, 44vw);
+    padding: 10px 16px 12px;
+    gap: 8px;
+  }
+  .wb-card-top {
+    padding-bottom: 6px;
+  }
+  .wb-page {
+    gap: 4px;
+  }
+  .wb-title {
+    font-size: clamp(1.3rem, 3.2vw, 1.7rem);
+  }
+  .wb-card .wb-text {
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+  .wb-tag {
+    width: min(400px, 48vw);
+    padding: 28px 16px 10px;
+  }
+  .wb-tag-k {
+    margin-bottom: 2px;
+    padding-bottom: 6px;
+  }
+  .wb-tag-brand {
+    font-size: 14px;
+  }
+  .wb-stat {
+    grid-template-columns: 7em 1fr;
+    align-items: baseline;
+    gap: 10px;
+    padding: 5px 0 6px;
+  }
+  .wb-stat-v {
+    font-size: 1.1rem;
+    white-space: nowrap;
+  }
+  .wb-stat-l {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .wb-tag-foot {
+    display: none;
+  }
+}

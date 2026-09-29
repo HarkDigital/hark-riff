@@ -37,20 +37,25 @@ function parseMark() {
 export const MARK_PATHS = parseMark()
 
 /**
- * The real wordmark, "Hark.Digital" (BRAND.short), in Hanken Grotesk: the dot
- * is a tiny opal bead lit by the accent gradient (rose → lilac). The period
- * stays in the markup (clipped) so copy/paste and find-in-page still read
- * "Hark.Digital". Styled by the .wm rules in ui.css.
+ * The real wordmark, "Hark.Digital" (BRAND.short), set in Anybody (heavy,
+ * a touch wide, like an amp's nameplate): the dot is a tiny faceted amber
+ * JEWEL LAMP, the pilot light of the whole site. The period stays in the
+ * markup (clipped) so copy/paste and find-in-page still read "Hark.Digital".
+ * Styled by the .wm rules in ui.css.
  */
 export const WORDMARK = `<span class="wm"><span class="wm-a">Hark</span><span class="wm-dot">.</span><span class="wm-b">Digital</span></span>`
 
-/** This site is a concept direction, not a rebrand: a small tag, never part of the name. */
+/**
+ * This site is a concept direction, not a rebrand: a small tag on its own
+ * plate, never part of the name. The concept's name is the headstock script
+ * (Yellowtail), like a model name under a maker's logo.
+ */
 export const CONCEPT_TAG = `<span class="wm-tag"><span class="wm-tag-k">Concept</span><b aria-hidden="true">·</b><em>${SITE.name}</em></span>`
 
 /**
  * Inline SVG markup for the mark. Everything fills with currentColor: the
- * Hark mark is never tinted (white in the chrome). The diamond keeps its own
- * class for the loader, which etches the mark clear through frosted glass.
+ * Hark mark is never tinted (cream / pearl white in the chrome). The diamond
+ * keeps its own class for callers that treat it apart from the loops.
  */
 export function markSvg(className = '', { title }: { title?: string } = {}) {
   const a11y = title ? `role="img" aria-label="${title}"` : 'aria-hidden="true" focusable="false"'

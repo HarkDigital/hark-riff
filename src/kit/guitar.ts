@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import { logoGeometry } from '../logo/logo'
 import type { Frame } from '../core/types'
 import { Strings } from './strings'
@@ -219,8 +219,8 @@ function topMaterial(burst: (typeof BURSTS)[keyof typeof BURSTS]) {
           // FLAME: bookmatched chevrons across the grain — fine, wavy, uneven —
           // chatoyant: the stripes swap light and dark as the view angle changes
           vec2 q = vObj.xy;
-          float warp = 0.34 * fnoise(q * vec2(1.6, 4.5)) + 0.12 * fnoise(q * vec2(4.0, 13.0));
-          float s = q.x * 5.2 + abs(q.y) * 3.1 + warp * 5.2;
+          float warp = 0.38 * fnoise(q * vec2(1.3, 2.4)) + 0.05 * fnoise(q * vec2(3.2, 6.0));
+          float s = q.x * 5.2 + abs(q.y) * 2.4 + warp * 5.2;
           vec3 V = normalize(cameraPosition - vWPos);
           float chat = dot(V, vGrainW);
           float fl = sin(s * 6.2831853 + chat * 5.0);
@@ -228,7 +228,9 @@ function topMaterial(burst: (typeof BURSTS)[keyof typeof BURSTS]) {
           // the figure comes and goes across the top (bookmatched: mirrored in y)
           float figPatch = smoothstep(0.25, 0.75, fnoise(vec2(q.x * 0.9, abs(q.y) * 1.3) + 3.0));
           float strength = uFlame * mix(0.35, 1.0, uFinish) * (0.45 + 0.55 * figPatch) * (1.0 - 0.6 * (1.0 - smoothstep(0.0, 0.35, e)));
-          float fig = 1.0 + strength * (fl - 0.5) * 0.4;
+          // stripes fade in and out along their length (not a regular pattern)
+          float along = 0.6 + 0.4 * fnoise(vec2(s * 0.35, q.y * 3.0));
+          float fig = 1.0 + strength * along * (fl - 0.5) * 0.44;
           // fine grain along the length
           float grain = 1.0 + 0.05 * (fnoise(vec2(q.x * 3.0, q.y * 160.0)) - 0.5);
           vec3 wood = base * fig * grain;
@@ -238,8 +240,8 @@ function topMaterial(burst: (typeof BURSTS)[keyof typeof BURSTS]) {
         }`,
       )
       .replace(
-        '#include <clearcoat_fragment_maps>',
-        `#include <clearcoat_fragment_maps>
+        '#include <lights_physical_fragment>',
+        `#include <lights_physical_fragment>
         material.clearcoat *= uFinish;`,
       )
   }
@@ -265,7 +267,7 @@ function sideMaterial(edge: string) {
         vec3 raw = vec3(0.62, 0.36, 0.22);
         diffuseColor.rgb *= mix(mix(raw, uEdgeC, uFinish), uBinding, bind * uFinish);`,
       )
-      .replace('#include <clearcoat_fragment_maps>', `#include <clearcoat_fragment_maps>\nmaterial.clearcoat *= uFinish;`)
+      .replace('#include <lights_physical_fragment>', `#include <lights_physical_fragment>\nmaterial.clearcoat *= uFinish;`)
   }
   return { mat, uniforms }
 }
@@ -289,6 +291,10 @@ export interface Guitar {
     frets: THREE.InstancedMesh
     inlays: THREE.Mesh
     tuners: THREE.Group
+    /** the static string runs (bridge → tailpiece, nut → posts) */
+    runs: THREE.Mesh
+    /** the body's back cap and side wall (the carved top is `top`) */
+    shell: THREE.Mesh[]
   }
   /** 0 raw maple, matte → 1 lacquered sunburst */
   finish: number
@@ -350,11 +356,31 @@ export function buildGuitar(opts: GuitarOptions = {}): Guitar {
   const back = mahogany()
   back.color.set('#6a4030')
   const side = sideMaterial(burst.edge)
-  const bodyMesh = new THREE.Mesh(sides, [back, side.mat])
-  bodyMesh.position.z = -BODY_DEPTH
-  bodyMesh.castShadow = true
-  bodyMesh.receiveShadow = true
-  body.add(bodyMesh)
+  // split the extrusion: the back cap keeps its UVs; the side wall gets
+  // SMOOTH normals (ExtrudeGeometry's are per face, so the clearcoat showed
+  // the env's gels as flat stripes round the rim)
+  const half = sides.groups[1].start
+  const pick = (name: string, from: number, to: number) => {
+    const a = sides.getAttribute(name) as THREE.BufferAttribute
+    return new THREE.BufferAttribute((a.array as Float32Array).slice(from * a.itemSize, to * a.itemSize), a.itemSize)
+  }
+  const backGeo = new THREE.BufferGeometry()
+  for (const name of ['position', 'normal', 'uv']) backGeo.setAttribute(name, pick(name, 0, half))
+  let wallGeo = new THREE.BufferGeometry()
+  wallGeo.setAttribute('position', pick('position', half, sides.attributes.position.count))
+  wallGeo = mergeVertices(wallGeo, 1e-5)
+  wallGeo.computeVertexNormals()
+  sides.dispose()
+  const backMesh = new THREE.Mesh(backGeo, back)
+  const wallMesh = new THREE.Mesh(wallGeo, side.mat)
+  backMesh.name = 'shell-back'
+  wallMesh.name = 'shell-wall'
+  for (const m of [backMesh, wallMesh]) {
+    m.position.z = -BODY_DEPTH
+    m.castShadow = true
+    m.receiveShadow = true
+    body.add(m)
+  }
 
   // the carved top: the outline, subdivided, lifted by distance to the edge
   const flat = new THREE.ShapeGeometry(new THREE.Shape(outline), 1)
@@ -517,7 +543,14 @@ export function buildGuitar(opts: GuitarOptions = {}): Guitar {
     hs.setFromPoints(c.getPoints(80))
     const g = new THREE.ExtrudeGeometry(hs, { depth: 0.13, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 2, curveSegments: 1 })
     g.translate(0, 0, -0.13)
-    const face = new THREE.Mesh(g, [blackGloss(), mahogany()])
+    // satin-ish lacquer: a mirror bevel under a tight spot throws bloom stars
+    const faceMat = blackGloss()
+    faceMat.clearcoatRoughness = 0.12
+    faceMat.roughness = 0.45
+    const hsSide = mahogany()
+    hsSide.clearcoat = 0.5
+    hsSide.clearcoatRoughness = 0.3
+    const face = new THREE.Mesh(g, [faceMat, hsSide])
     face.castShadow = true
     face.receiveShadow = true
     headstock.add(face)
@@ -703,6 +736,7 @@ export function buildGuitar(opts: GuitarOptions = {}): Guitar {
   }
 
   /* ---- strings ---- */
+  let runs!: THREE.Mesh
   const from: THREE.Vector3[] = []
   const to: THREE.Vector3[] = []
   for (let i = 0; i < 6; i++) {
@@ -738,7 +772,8 @@ export function buildGuitar(opts: GuitarOptions = {}): Guitar {
       const postTop = new THREE.Vector3(u, v, 0.09).applyMatrix4(hsM)
       seg(to[i], postTop, r)
     }
-    const runs = new THREE.Mesh(mergeGeometries(g), nickel(0.25))
+    runs = new THREE.Mesh(mergeGeometries(g), nickel(0.25))
+    runs.name = 'string-runs'
     group.add(runs)
   }
 
@@ -749,7 +784,7 @@ export function buildGuitar(opts: GuitarOptions = {}): Guitar {
   const guitar: Guitar = {
     group,
     strings,
-    parts: { body, top: topMesh, neck, headstock, logo: logo!, pickups, bridge, tailpiece, knobs, toggle, frets, inlays, tuners },
+    parts: { body, top: topMesh, neck, headstock, logo: logo!, pickups, bridge, tailpiece, knobs, toggle, frets, inlays, tuners, runs, shell: [backMesh, wallMesh] },
     finish: 1,
     fretX,
     stringY,

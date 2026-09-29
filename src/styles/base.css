@@ -29,8 +29,6 @@
   --oxblood: #8e2a22;
   --clip: #ff5a44;
   --burst-grad: linear-gradient(95deg, #ffd98a 0%, #f2a33a 45%, #d0602a 100%);
-  /* aliases for UI inherited from the engine donor (remove once ui.css is RIFF's own) */
-  --accent-grad: var(--burst-grad);
 
   --fg: var(--paper);
   --fg-muted: rgba(243, 230, 204, 0.8);
@@ -41,7 +39,6 @@
 
   --font-display: 'Anybody Variable', 'Arial Black', system-ui, sans-serif;
   --font-script: 'Yellowtail', 'Brush Script MT', cursive;
-  --font-serif: var(--font-script);
   --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
   --font-mono: 'Spline Sans Mono Variable', ui-monospace, monospace;
 
@@ -282,7 +279,9 @@ a {
   letter-spacing: 0;
   font-size: 1.18em;
   line-height: 0.8;
-  padding: 0 0.08em 0 0.02em;
+  /* room for Yellowtail's swashes (background-clip:text clips at the box) */
+  padding: 0.04em 0.2em 0.1em 0.04em;
+  margin: 0 -0.16em 0 -0.02em;
   color: var(--amber-hot);
 }
 /* the script lit by the sunburst — only where text clipping is supported

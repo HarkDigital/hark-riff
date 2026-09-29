@@ -267,7 +267,7 @@ export class World {
     this.spot = new THREE.SpotLight(GEL.tungsten, 0, 0, 0.42, 0.55, 1.2)
     this.spot.castShadow = true
     this.spot.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048)
-    this.spot.shadow.bias = -0.0004
+    this.spot.shadow.bias = -0.00025
     this.spot.shadow.normalBias = 0.012
     this.spot.shadow.radius = 2
     this.spot.shadow.camera.near = 0.5
@@ -357,6 +357,19 @@ export class World {
     s.target.updateMatrixWorld()
     // no shadow render while the spot is dark (the program keys stay the same)
     s.shadow.autoUpdate = n.spot > 0.002
+    // fit the shadow depth range to the throw: with near 0.5 / far 80 the bias
+    // swallowed occluders within ~0.4 units (strings 0.035 above the board)
+    {
+      const d = c.spotPos.distanceTo(c.spotAt)
+      const near = Math.max(0.5, Math.round((d - 13) * 4) / 4)
+      const far = Math.round((d + 22) * 4) / 4
+      const sc = s.shadow.camera
+      if (sc.near !== near || sc.far !== far) {
+        sc.near = near
+        sc.far = far
+        sc.updateProjectionMatrix()
+      }
+    }
 
     // rim lights: directions relative to the camera's orientation
     camera.getWorldQuaternion(this.tmpQ)

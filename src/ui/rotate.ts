@@ -1,28 +1,31 @@
 import { holdInert, releaseInert } from './inert'
 import { MICROCOPY } from '../content'
 import { storeKey } from './prefs'
+import { publishTextures } from './texture'
 
 /*
- * Phone-landscape suggestion, as a small FROSTED GLASS CARD in the dark
- * gallery: on the left a little frosted tile lit from behind (a rose → lilac
- * card and a bank of thin tubes, diffused) with a phone etched clear through
- * it — its window shows the tubes crisp — that turns upright ONCE, so its
- * lines come to rest parallel with the light behind (never a loop; simply
- * upright under reduced motion / Motion off). On the right, "Turn your phone
- * upright" (thin Hanken; "upright" is the Cormorant accent), "This gallery is
- * hung for portrait." and "Continue anyway". The scene is paused underneath
- * (createChrome wires onChange to the scene hold). Tablets and laptops in
- * landscape are taller than 500px and never see it.
+ * Phone-landscape suggestion — RIFF: a ROAD CASE in the follow spot. The
+ * card is a flight-case lid: black pebbled laminate inside an aluminium
+ * extrusion, chrome ball corners, a butterfly latch on the front edge. On
+ * the lid, spray-stencilled in cream, the shipping symbol THIS WAY UP (two
+ * arrows over a bar) above a stencilled phone that turns upright ONCE, so
+ * it comes to rest under the arrows (never a loop; simply upright under
+ * reduced motion / Motion off). Beside it: "Turn your phone upright"
+ * (Anybody, heavy and wide; "upright" is the Yellowtail script), "This stage
+ * is set for portrait." and "Continue anyway" (the cream-gold plate). The
+ * scene is paused underneath (createChrome wires onChange to the scene
+ * hold). Tablets and laptops in landscape are taller than 500px and never
+ * see it.
  *
  * It is a suggestion, never a lock (WCAG 1.3.4): "Continue anyway" (or
  * Escape, as a dialog promises) releases it for the rest of the session. It
  * speaks once: focus moved to the card reads its name and description; the
  * live region only speaks when focus stayed in the copy layer / on the skip
- * link (a reader who never lands on the card). While it shows, the skip link and the
- * linear copy layer in #track stay reachable, and their focus pills paint
- * above the card (it sits at z 25: over the chrome (10) and the stages (5),
- * under #track:focus-within (30) and the skip link (120)); only the chrome
- * and the stages behind it are inert.
+ * link (a reader who never lands on the card). While it shows, the skip
+ * link and the linear copy layer in #track stay reachable, and their focus
+ * pills paint above the card (it sits at z 25: over the chrome (10) and the
+ * stages (5), under #track:focus-within (30) and the skip link (120)); only
+ * the chrome and the stages behind it are inert.
  *
  * API: mountRotateGate(onChange?) / unmountRotateGate(). Safe to call more
  * than once: later calls just add their onChange listener.
@@ -46,44 +49,23 @@ const rememberDismissed = () => {
   }
 }
 
-/* the frosted tile (0..120) and its etched phone */
-const TUBES = [18, 36, 54, 72, 90, 108]
-const GLOW = ['#ff7aa8', '#f08cc4', '#dca0ea', '#c7a8ff', '#a9a4ff', '#8f9eff']
-const ART = `<svg class="rot-glass" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
-  <defs>
-    <linearGradient id="rot-card" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#ff7aa8"/><stop offset="0.55" stop-color="#c7a8ff"/><stop offset="1" stop-color="#7f9cff"/>
-    </linearGradient>
-    <filter id="rot-frost" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="4.2"/></filter>
-    <clipPath id="rot-clip"><rect width="120" height="120" rx="11"/></clipPath>
-    <clipPath id="rot-win"><rect x="44" y="33" width="32" height="54" rx="6"/></clipPath>
-    <linearGradient id="rot-sheen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fff" stop-opacity="0.14"/><stop offset="0.4" stop-color="#fff" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="rot-bevel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fff" stop-opacity="0.6"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.14"/><stop offset="1" stop-color="#fff" stop-opacity="0.28"/>
-    </linearGradient>
-  </defs>
-  <g clip-path="url(#rot-clip)">
-    <rect width="120" height="120" fill="#08070b"/>
-    <g filter="url(#rot-frost)" opacity="0.9">
-      <rect width="120" height="120" fill="url(#rot-card)"/>
-      ${TUBES.map((x, i) => `<line x1="${x}" y1="0" x2="${x}" y2="120" stroke="${GLOW[i]}" stroke-width="7"/><line x1="${x}" y1="0" x2="${x}" y2="120" stroke="#fff" stroke-opacity="0.8" stroke-width="2"/>`).join('')}
-    </g>
-    <rect width="120" height="120" fill="#fff" opacity="0.035"/>
-    <rect width="120" height="120" fill="url(#rot-sheen)"/>
-    <g class="rot-phone">
-      <g clip-path="url(#rot-win)">
-        <rect x="40" y="30" width="40" height="60" fill="#060509" opacity="0.72"/>
-        ${[48, 54, 60, 66, 72]
-          .map((x, i) => `<line x1="${x}" y1="30" x2="${x}" y2="90" stroke="${GLOW[i + 1]}" stroke-opacity="0.5" stroke-width="3"/><line x1="${x}" y1="30" x2="${x}" y2="90" stroke="#fff4f8" stroke-width="0.9"/>`)
-          .join('')}
-      </g>
-      <rect x="44" y="33" width="32" height="54" rx="6" fill="none" stroke="#fff" stroke-opacity="0.9" stroke-width="1.3"/>
-      <path d="M56 38.5h8" stroke="#fff" stroke-opacity="0.8" stroke-width="1.3" stroke-linecap="round"/>
-    </g>
+/* the stencil (0..110 × 0..132): THIS WAY UP over a phone; stencil bridges
+   are the gaps in the phone's outline. Painted twice: a soft overspray, then
+   the crisp paint. */
+const PAINT = `
+  <g class="rot-arrows">
+    <path d="M40 40V15M31 23.5l9-9.5 9 9.5M70 40V15M61 23.5l9-9.5 9 9.5"/>
+    <path d="M28 47h54"/>
   </g>
-  <rect x="0.6" y="0.6" width="118.8" height="118.8" rx="10.4" fill="none" stroke="url(#rot-bevel)" stroke-width="1.2"/>
+  <g class="rot-phone">
+    <rect x="33" y="60" width="44" height="68" rx="8" stroke-dasharray="101.2 4" stroke-dashoffset="36.6"/>
+    <path d="M48 67h14"/>
+    <circle cx="55" cy="120" r="2.6" class="rot-dot"/>
+  </g>`
+const ART = `<svg class="rot-stencil" viewBox="0 0 110 132" aria-hidden="true" focusable="false">
+  <defs><filter id="rot-spray" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>
+  <g class="rot-over" filter="url(#rot-spray)">${PAINT}</g>
+  <g class="rot-paint">${PAINT}</g>
 </svg>`
 
 let gate: {
@@ -105,6 +87,8 @@ export function mountRotateGate(onChange?: (shown: boolean) => void) {
   }
   if (typeof matchMedia === 'undefined') return
   let dismissed = wasDismissed()
+  // the case's laminate grain
+  publishTextures(['tolex'])
   const el = document.createElement('div')
   el.className = 'rot'
   // non-modal: the copy layer behind it stays in reach
@@ -113,14 +97,19 @@ export function mountRotateGate(onChange?: (shown: boolean) => void) {
   el.setAttribute('aria-describedby', 'rot-sub')
   el.tabIndex = -1
   el.innerHTML = `
-    <div class="rot-card">
-      <div class="rot-art" aria-hidden="true">${ART}</div>
-      <div class="rot-text">
-        <p class="rot-k" aria-hidden="true">${MICROCOPY.signalEyebrow}</p>
-        <h2 class="rot-title" id="rot-title">Turn your phone <em>upright</em></h2>
-        <p class="rot-sub" id="rot-sub">This gallery is hung for portrait.</p>
-        <p class="rot-actions"><button class="hud-btn hud-btn--ghost rot-go" type="button">Continue anyway</button></p>
+    <div class="rot-case">
+      <div class="rot-lid">
+        <div class="rot-art" aria-hidden="true">${ART}</div>
+        <div class="rot-text">
+          <p class="rot-k" aria-hidden="true">${MICROCOPY.signalEyebrow}</p>
+          <h2 class="rot-title" id="rot-title">Turn your phone <em>upright</em></h2>
+          <p class="rot-sub" id="rot-sub">This stage is set for portrait.</p>
+          <p class="rot-actions"><button class="hud-btn rot-go" type="button">Continue anyway</button></p>
+        </div>
       </div>
+      <i class="rot-ball rot-ball--tl" aria-hidden="true"></i><i class="rot-ball rot-ball--tr" aria-hidden="true"></i>
+      <i class="rot-ball rot-ball--bl" aria-hidden="true"></i><i class="rot-ball rot-ball--br" aria-hidden="true"></i>
+      <i class="rot-latch" aria-hidden="true"></i>
     </div>
     <p class="sr-only" aria-live="assertive" data-rot-live></p>`
   // right after the skip link: Tab goes skip link → this card → the page
@@ -160,7 +149,7 @@ export function mountRotateGate(onChange?: (shown: boolean) => void) {
       // changes after it is shown)
       if (keep)
         window.setTimeout(() => {
-          if (on) live.textContent = 'Turn your phone upright. This gallery is hung for portrait.'
+          if (on) live.textContent = 'Turn your phone upright. This stage is set for portrait.'
         }, 60)
     } else {
       releaseInert('rotate')
