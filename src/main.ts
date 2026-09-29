@@ -1,6 +1,10 @@
-// THEME: fonts (@fontsource packages). Neutral defaults: Inter + JetBrains Mono.
-import '@fontsource-variable/inter'
-import '@fontsource-variable/jetbrains-mono'
+// RIFF fonts: Anybody (display — its width axis runs out to 150, amp-panel
+// caps and gig-poster headlines), Yellowtail (the headstock script, one word
+// at a time), Instrument Sans (text), Spline Sans Mono (knob labels, HUD).
+import '@fontsource-variable/anybody/wdth.css'
+import '@fontsource/yellowtail'
+import '@fontsource-variable/instrument-sans/wdth.css'
+import '@fontsource-variable/spline-sans-mono'
 import './styles/base.css'
 import './ui/ui.css'
 

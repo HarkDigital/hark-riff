@@ -48,9 +48,13 @@ export interface ChapterContext {
   renderer: THREE.WebGLRenderer
   camera: THREE.PerspectiveCamera
   /**
-   * The shared world (backdrop + lighting). Set world.params each frame you
-   * care (the engine resets them to defaults first). THEME: replace
-   * src/world/World.ts and update this comment.
+   * The shared stage (src/world/World.ts): warm black backdrop with backlit
+   * HAZE, gel BEAMS and truss BOKEH; the FOLLOW SPOT (the only shadow caster:
+   * spot/spotColor/spotPos/spotAt/spotAngle/spotPenumbra); two camera-relative
+   * RIM lights (rimA/rimB + colours + dirs); a low fill; PMREM stage
+   * reflections (a row of PAR cans) as scene.environment (env/envTurn).
+   * Set world.params each frame you care (the engine resets them first).
+   * Gels: import { GEL } from '../world/World'.
    */
   world: World
   post: Post
@@ -90,6 +94,12 @@ export interface Chapter {
    * the story at anchors[i].
    */
   anchors?: number[]
+  /**
+   * True while the chapter's own time-paced animation is still catching up
+   * with the scroll (a rate-capped story clock, a calm dissolve). Keeps the
+   * engine's Motion-off 2 fps heartbeat awake so the catch-up stays smooth.
+   */
+  busy?(): boolean
   /** Optional hover/click raycast hooks (pointer in NDC). */
   onPointerDown?(frame: Frame, ctx: ChapterContext): void
 }

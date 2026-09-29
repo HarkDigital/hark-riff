@@ -3,6 +3,10 @@
 //   node scripts/shot.mjs --frames=hero:0,hero:0.5,work:0.3 [--port=5173] [--out=shots]
 //                         [--w=1440] [--h=900] [--mobile] [--wait=1800] [--only=hero]
 //                         [--tag=name] [--mouse=0.3,-0.2] [--rm]
+//                         [--cam=px,py,pz,tx,ty,tz[,fov]]  (fixed debug camera)
+//                         [--eval="js"]  (run in the page after each jump, e.g. hide a mesh)
+//                         [--norot]  (dismiss the phone-landscape rotate card first)
+//                         [--q="lab&view=macro"]  (extra URL params for the page)
 //
 // Each frame is "<chapter>:<local 0..1>" or "p:<global 0..1>". Images land in
 // <out>/<tag?>-<chapter>-<local>.png. Console errors from the page are printed,
@@ -63,9 +67,20 @@ try {
   const q = new URLSearchParams({ nointro: '1' })
   if (args.only) q.set('only', args.only)
   if (args.debug) q.set('debug', '1')
+  if (args.cam) q.set('cam', String(args.cam))
+  if (args.q) for (const [k, v] of new URLSearchParams(String(args.q))) q.set(k, v)
   await page.goto(`http://localhost:${port}/?${q}`, { waitUntil: 'load', timeout: 90000 })
   await page.waitForFunction('window.__hark && window.__hark.ready', { timeout: 90000 })
   await new Promise(r => setTimeout(r, 800))
+
+  // --norot: dismiss the phone-landscape rotate card ("Continue anyway") so the scene runs
+  if (args.norot) {
+    await page.evaluate(() => {
+      const b = document.querySelector('.rot button, .rot-go, [data-continue]')
+      if (b) b.click()
+    })
+    await new Promise(r => setTimeout(r, 300))
+  }
 
   if (args.mouse) {
     const [mx, my] = String(args.mouse).split(',').map(Number)
@@ -81,6 +96,7 @@ try {
       await page.waitForFunction('window.__hark && window.__hark.ready', { timeout: 90000 })
       if (id === 'p') await page.evaluate(v => window.__hark.goto(v), local)
       else await page.evaluate((c, v) => window.__hark.gotoChapter(c, v), id, local)
+      if (args.eval) await page.evaluate(String(args.eval))
       await new Promise(r => setTimeout(r, WAIT))
       if (id === 'p') break
       const at = await page
